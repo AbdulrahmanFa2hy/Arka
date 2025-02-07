@@ -11,7 +11,6 @@ import CartSidebar from './components/CartSidebar';
 
 function AppContent() {
   const { searchQuery } = useCart();
-  const [isCheckout, setIsCheckout] = useState(false);
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -51,7 +50,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {searchQuery && filteredProducts.length === 0 && (
           <div className="mb-8">
             <div className="text-center py-4">
