@@ -29,7 +29,7 @@ export default function ProductDetails() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-12">
           {/* Left Column - Image */}
-          <div className="lg:w-1/2">
+          <div className="lg:w-2/5"> {/* Changed from lg:w-1/2 to lg:w-2/5 */}
             <div className="sticky top-24 space-y-4">
               <div className="aspect-square rounded-2xl overflow-hidden bg-white shadow-lg">
                 <img
@@ -77,16 +77,6 @@ export default function ProductDetails() {
 
               <div className="prose prose-lg max-w-none mb-8">
                 <p className="text-gray-600">{product.description}</p>
-              </div>
-
-              {/* Specifications */}
-              <div className="grid grid-cols-2 gap-6 p-6 bg-gray-50 rounded-xl mb-8">
-                {Object.entries(product.specs || {}).map(([key, value]) => (
-                  <div key={key} className="flex flex-col">
-                    <span className="text-sm text-gray-500 capitalize">{key}</span>
-                    <span className="font-medium text-gray-900">{value}</span>
-                  </div>
-                ))}
               </div>
 
               {/* Add to Cart Button */}

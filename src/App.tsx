@@ -8,6 +8,7 @@ import { useCart } from './context/CartContext';
 import ProductDetails from './pages/ProductDetails';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import CartSidebar from './components/CartSidebar';
+import { Toaster } from 'react-hot-toast';
 
 function AppContent() {
   const { searchQuery } = useCart();
@@ -92,20 +93,23 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   return (
-    <CartProvider>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<AppContent />} />
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-        </Routes>
-        <CartSidebar 
-          isOpen={isCartOpen} 
-          onClose={() => setIsCartOpen(false)}
-        />
-      </BrowserRouter>
-    </CartProvider>
+    <>
+      <Toaster position="top-center" />
+      <CartProvider>
+        <BrowserRouter>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<AppContent />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+          </Routes>
+          <CartSidebar 
+            isOpen={isCartOpen} 
+            onClose={() => setIsCartOpen(false)}
+          />
+        </BrowserRouter>
+      </CartProvider>
+    </>
   );
 }
 

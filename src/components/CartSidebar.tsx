@@ -6,10 +6,9 @@ import { useNavigate } from 'react-router-dom';
 interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  onCheckout: () => void;
 }
 
-const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }) => {
+const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
   const { cartItems, removeFromCart, increaseQuantity, decreaseQuantity } = useCart();
   const navigate = useNavigate();
   
@@ -95,7 +94,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, onCheckout }
                   }}
                   className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors"
                 >
-                  Checkout
+                  Checkout 
                 </button>
               </div>
             )}
