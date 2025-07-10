@@ -54,7 +54,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
             </div>
             
             {/* Cart Items */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-2">
               {cartItems.length === 0 ? (
                 <div className="text-center py-12">
                   <ShoppingBag className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -62,9 +62,9 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
                   <p className="text-sm text-gray-400">Add some products to get started</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="group bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200">
+                    <div key={item.id} className="group bg-gray-50 rounded-xl p-3 hover:bg-gray-100 transition-all duration-200">
                       <div className="flex items-start space-x-4">
                         <div className="relative">
                           <img 
@@ -72,12 +72,12 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
                             alt={item.title} 
                             className="w-20 h-20 object-cover rounded-lg shadow-sm"
                           />
-                          <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                          <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-sm font-bold rounded-full w-6 h-6 flex items-center justify-center">
                             {item.quantity}
                           </div>
                         </div>
                         
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 pl-1">
                           <h3 className="font-semibold text-gray-800 truncate mb-1">{item.title}</h3>
                           <div className="flex gap-5 py-2">
                           <p className="text-lg font-bold text-blue-600">${item.price}</p>
@@ -87,13 +87,13 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
                               onClick={() => handleDecreaseQuantity(item)}
                               className="p-1.5 hover:bg-white rounded-lg transition-colors border border-gray-200"
                             >
-                              <Minus className="h-4 w-4 text-gray-600" />
+                              <Minus className="h-6 w-6 text-gray-600" />
                             </button>
                             <button
                               onClick={() => increaseQuantity(item.id)}
                               className="p-1.5 hover:bg-white rounded-lg transition-colors border border-gray-200"
                             >
-                              <Plus className="h-4 w-4 text-gray-600" />
+                              <Plus className="h-6 w-6 text-gray-600" />
                             </button>
                           </div>
                           </div>
@@ -103,7 +103,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
                           onClick={() => removeFromCart(item.id)}
                           className="p-2 hover:bg-red-50 rounded-lg transition-colors group-hover:opacity-100 opacity-0"
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-6 w-6 text-red-500" />
                         </button>
                       </div>
                     </div>
@@ -114,7 +114,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose }) => {
             
             {/* Footer */}
             {cartItems.length > 0 && (
-              <div className="border-t border-gray-100 p-6 bg-gray-50">
+              <div className="border-t border-gray-100 p-6 pb-2 bg-gray-50">
                 <div className="space-y-4">
                   <div className="">
                     <div className="flex justify-between items-center">
