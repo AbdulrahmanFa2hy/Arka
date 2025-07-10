@@ -29,6 +29,8 @@ export default function Checkout({ onBack }: CheckoutProps) {
     city: "",
     country: "",
   });
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -36,24 +38,81 @@ export default function Checkout({ onBack }: CheckoutProps) {
   );
   const estimatedShipping = shippingTimes[formData.country] || shippingTimes.Default;
 
-  const validateForm = () => {
-    if (!formData.email || !formData.email.includes('@')) {
-      toast.error('Please enter a valid email address');
-      return false;
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'email':
+        if (!value) return 'Email is required';
+        if (!/\S+@\S+\.\S+/.test(value)) return 'Please enter a valid email address';
+        return '';
+      case 'name':
+        if (!value.trim()) return 'Name is required';
+        if (value.trim().length < 2) return 'Name must be at least 2 characters';
+        return '';
+      case 'address':
+        if (!value.trim()) return 'Address is required';
+        if (value.trim().length < 10) return 'Address must be at least 10 characters';
+        return '';
+      case 'city':
+        if (!value.trim()) return 'City is required';
+        return '';
+      case 'country':
+        if (!value.trim()) return 'Country is required';
+        return '';
+      default:
+        return '';
     }
-    if (!formData.name || formData.name.trim().length < 2) {
-      toast.error('Please enter your full name');
-      return false;
-    }
-    if (!formData.address || !formData.city || !formData.country) {
-      toast.error('Please fill in all address fields');
-      return false;
-    }
-    return true;
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    const fields = ['email', 'name', 'address', 'city', 'country'];
+    
+    fields.forEach(field => {
+      const error = validateField(field, formData[field as keyof FormData]);
+      if (error) {
+        newErrors[field] = error;
+      }
+    });
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Mark field as touched and validate
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    const error = validateField(name, value);
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
+    }));
+  };
+
+
+
   const handleSubmit = async () => {
-    if (!validateForm()) return;
+    // Mark all fields as touched
+    const allTouched = {
+      email: true,
+      name: true,
+      address: true,
+      city: true,
+      country: true,
+    };
+    setTouched(allTouched);
+    
+    if (!validateForm()) {
+      toast.error('Please fix the form errors before submitting');
+      return;
+    }
     
     try {
       const orderId = `${Date.now()}`;
@@ -135,13 +194,6 @@ export default function Checkout({ onBack }: CheckoutProps) {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
   const handleNext = () => {
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
@@ -171,6 +223,8 @@ export default function Checkout({ onBack }: CheckoutProps) {
                   formData={formData}
                   estimatedShipping={estimatedShipping}
                   handleChange={handleChange}
+                  errors={errors}
+                  touched={touched}
                 />
                 <DeliveryOptions estimatedShipping={estimatedShipping} />
               </form>

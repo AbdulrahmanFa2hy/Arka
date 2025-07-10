@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Search, Tag } from 'lucide-react';
 import { Category, FilterParams } from '../services/api';
 
 interface ProductFiltersProps {
@@ -11,7 +11,7 @@ interface ProductFiltersProps {
 export default function ProductFilters({ onFilterChange, isVisible, onToggle }: ProductFiltersProps) {
   const [categoriesWithProducts, setCategoriesWithProducts] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | ''>('');
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [exactPrice, setExactPrice] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -56,10 +56,8 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
       filters.categoryId = selectedCategory as number;
     }
     
-    // Only apply price range filter if both min and max have values
-    if (priceRange.min && priceRange.max) {
-      filters.price_min = parseFloat(priceRange.min);
-      filters.price_max = parseFloat(priceRange.max);
+    if (exactPrice && !isNaN(parseFloat(exactPrice))) {
+      filters.price = parseFloat(exactPrice);
     }
 
     onFilterChange(filters);
@@ -67,34 +65,37 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
 
   const clearFilters = () => {
     setSelectedCategory('');
-    setPriceRange({ min: '', max: '' });
+    setExactPrice('');
     onFilterChange({});
   };
 
   useEffect(() => {
     handleFilterChange();
-  }, [selectedCategory, priceRange]);
+  }, [selectedCategory, exactPrice]);
 
   return (
     <>
       {/* Mobile Filter Button */}
       <button
         onClick={onToggle}
-        className="lg:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg z-40"
+        className="lg:hidden fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg z-40 hover:bg-blue-700 transition-colors"
       >
         <Filter className="h-6 w-6" />
       </button>
 
-      {/* Filter Sidebar */}
+      {/* Mobile Filter Sidebar */}
       <div className={`
-        fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden
+        fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden
         ${isVisible ? 'block' : 'hidden'}
       `}>
-        <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-xl">
+        <div className="absolute right-0 top-0 h-full w-80 bg-white shadow-2xl">
           <div className="p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">Filters</h2>
-              <button onClick={onToggle} className="p-2 hover:bg-gray-100 rounded-full">
+              <h2 className="text-xl font-bold flex items-center">
+                <Filter className="h-5 w-5 mr-2 text-blue-500" />
+                Filters
+              </h2>
+              <button onClick={onToggle} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -102,7 +103,10 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
             <div className="space-y-6">
               {/* Categories */}
               <div>
-                <h3 className="font-semibold mb-3">Categories</h3>
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <Tag className="h-4 w-4 mr-2 text-gray-500" />
+                  Categories
+                </h3>
                 {loading ? (
                   <div className="space-y-2">
                     {[...Array(5)].map((_, i) => (
@@ -111,26 +115,26 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <label className="flex items-center">
+                    <label className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
                       <input
                         type="radio"
                         name="category"
                         value=""
                         checked={selectedCategory === ''}
                         onChange={(e) => setSelectedCategory(e.target.value === '' ? '' : parseInt(e.target.value))}
-                        className="mr-2"
+                        className="mr-3 text-blue-500"
                       />
-                      <span>All Categories</span>
+                      <span className="font-medium">All Categories</span>
                     </label>
                     {categoriesWithProducts.map((category) => (
-                      <label key={category.id} className="flex items-center">
+                      <label key={category.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
                         <input
                           type="radio"
                           name="category"
                           value={category.id}
                           checked={selectedCategory === category.id}
                           onChange={(e) => setSelectedCategory(e.target.value === '' ? '' : parseInt(e.target.value))}
-                          className="mr-2"
+                          className="mr-3 text-blue-500"
                         />
                         <span>{category.name}</span>
                       </label>
@@ -139,45 +143,42 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
                 )}
               </div>
 
-              {/* Price Range */}
+              {/* Exact Price */}
               <div>
-                <h3 className="font-semibold mb-3">Price Range</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">Min Price</label>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={priceRange.min}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-600 mb-1">Max Price</label>
-                    <input
-                      type="number"
-                      placeholder="1000"
-                      value={priceRange.max}
-                      onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  {priceRange.min && !priceRange.max && (
-                    <p className="text-sm text-gray-500">Please enter both min and max price</p>
-                  )}
-                  {!priceRange.min && priceRange.max && (
-                    <p className="text-sm text-gray-500">Please enter both min and max price</p>
+                <h3 className="font-semibold mb-3 flex items-center">
+                  <Search className="h-4 w-4 mr-2 text-gray-500" />
+                  Price Filter
+                </h3>
+                <div className="relative">
+                  <input
+                    type="number"
+                    placeholder="Enter exact price..."
+                    value={exactPrice}
+                    onChange={(e) => setExactPrice(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  />
+                  {exactPrice && (
+                    <button
+                      onClick={() => setExactPrice('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
                   )}
                 </div>
+                {exactPrice && (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Showing products with price: ${exactPrice}
+                  </p>
+                )}
               </div>
 
               {/* Clear Filters */}
               <button
                 onClick={clearFilters}
-                className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
               >
-                Clear Filters
+                Clear All Filters
               </button>
             </div>
           </div>
@@ -186,12 +187,15 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
 
       {/* Desktop Filter Sidebar */}
       <div className="hidden lg:block w-64 bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit sticky top-24">
-        <h2 className="text-xl font-bold mb-6">Filters</h2>
+        <h2 className="text-xl font-bold mb-6 flex items-center">
+          <Filter className="h-5 w-5 mr-2 text-blue-500" />
+          Filters
+        </h2>
         
         <div className="space-y-6">
           {/* Categories */}
           <div>
-            <h3 className="font-semibold mb-3">Categories</h3>
+           
             {loading ? (
               <div className="space-y-2">
                 {[...Array(5)].map((_, i) => (
@@ -200,26 +204,26 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
               </div>
             ) : (
               <div className="space-y-2">
-                <label className="flex items-center">
+                <label className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
                   <input
                     type="radio"
                     name="category"
                     value=""
                     checked={selectedCategory === ''}
                     onChange={(e) => setSelectedCategory(e.target.value === '' ? '' : parseInt(e.target.value))}
-                    className="mr-2"
+                    className="mr-3 text-blue-500"
                   />
-                  <span>All Categories</span>
+                  <span className="font-medium">All Categories</span>
                 </label>
                 {categoriesWithProducts.map((category) => (
-                  <label key={category.id} className="flex items-center">
+                  <label key={category.id} className="flex items-center p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="category"
                       value={category.id}
                       checked={selectedCategory === category.id}
                       onChange={(e) => setSelectedCategory(e.target.value === '' ? '' : parseInt(e.target.value))}
-                      className="mr-2"
+                      className="mr-3 text-blue-500"
                     />
                     <span>{category.name}</span>
                   </label>
@@ -228,45 +232,42 @@ export default function ProductFilters({ onFilterChange, isVisible, onToggle }: 
             )}
           </div>
 
-          {/* Price Range */}
+          {/* Exact Price */}
           <div>
-            <h3 className="font-semibold mb-3">Price Range</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Min Price</label>
-                <input
-                  type="number"
-                  placeholder="0"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Max Price</label>
-                <input
-                  type="number"
-                  placeholder="1000"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              {priceRange.min && !priceRange.max && (
-                <p className="text-sm text-gray-500">Please enter both min and max price</p>
-              )}
-              {!priceRange.min && priceRange.max && (
-                <p className="text-sm text-gray-500">Please enter both min and max price</p>
+            <h3 className="font-semibold mb-3 flex items-center">
+              <Search className="h-4 w-4 mr-2 text-gray-500" />
+              Price Filter
+            </h3>
+            <div className="relative">
+              <input
+                type="number"
+                placeholder="Enter exact price..."
+                value={exactPrice}
+                onChange={(e) => setExactPrice(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              />
+              {exactPrice && (
+                <button
+                  onClick={() => setExactPrice('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-4 w-4" />
+                </button>
               )}
             </div>
+            {exactPrice && (
+              <p className="mt-2 text-sm text-gray-500">
+                Showing products with price: ${exactPrice}
+              </p>
+            )}
           </div>
 
           {/* Clear Filters */}
           <button
             onClick={clearFilters}
-            className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+            className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
           >
-            Clear Filters
+            Clear All Filters
           </button>
         </div>
       </div>

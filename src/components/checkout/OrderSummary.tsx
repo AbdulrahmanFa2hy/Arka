@@ -1,4 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, AlertCircle } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -19,13 +19,53 @@ export function OrderSummary({ total, onSubmit, formData }: OrderSummaryProps) {
   const { clearCart } = useCart();
   const navigate = useNavigate();
 
-  const isFormValid = () => {
-    return formData.email && formData.name && formData.address && formData.city && formData.country;
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    
+    // Email validation
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+    
+    // Address validation
+    if (!formData.address.trim()) {
+      errors.address = 'Address is required';
+    } else if (formData.address.trim().length < 10) {
+      errors.address = 'Address must be at least 10 characters';
+    }
+    
+    // City validation
+    if (!formData.city.trim()) {
+      errors.city = 'City is required';
+    }
+    
+    // Country validation
+    if (!formData.country.trim()) {
+      errors.country = 'Country is required';
+    }
+    
+    return errors;
+  };
+
+  const getValidationErrors = () => {
+    return validateForm();
   };
 
   const handleConfirmOrder = async () => {
-    if (!isFormValid()) {
-      toast.error('Please fill in all shipping details before confirming your order.', {
+    const errors = validateForm();
+    
+    if (Object.keys(errors).length > 0) {
+      const errorMessages = Object.values(errors).join(', ');
+      toast.error(`Please fix the following errors: ${errorMessages}`, {
         duration: 4000,
         position: 'top-center',
         style: {
@@ -68,6 +108,9 @@ export function OrderSummary({ total, onSubmit, formData }: OrderSummaryProps) {
     }
   };
 
+  const errors = getValidationErrors();
+  const hasErrors = Object.keys(errors).length > 0;
+
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 sticky top-24">
       <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
@@ -90,9 +133,11 @@ export function OrderSummary({ total, onSubmit, formData }: OrderSummaryProps) {
         </div>
       </div>
 
+      
+
       <button
         onClick={handleConfirmOrder}
-        disabled={!isFormValid()}
+        disabled={hasErrors}
         className="mt-6 w-full bg-blue-500 text-white py-3 px-6 rounded-lg
                  hover:bg-blue-600 transform transition-all duration-200
                  hover:scale-[1.02] active:scale-[0.98] shadow-lg
@@ -100,7 +145,7 @@ export function OrderSummary({ total, onSubmit, formData }: OrderSummaryProps) {
                  focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 
                  disabled:cursor-not-allowed disabled:transform-none"
       >
-        {isFormValid() ? 'Confirm Order' : 'Fill Shipping Details'}
+        {hasErrors ? 'Complete Shipping Details' : 'Confirm Order'}
       </button>
 
       <div className="mt-6 flex items-center justify-center text-sm text-gray-500">
