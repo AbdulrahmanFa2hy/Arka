@@ -22,7 +22,6 @@ export default function Checkout({ onBack }: CheckoutProps) {
   const { cartItems } = useCart();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     email: "",
     name: "",
@@ -53,12 +52,8 @@ export default function Checkout({ onBack }: CheckoutProps) {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!validateForm()) return;
-    
-    setIsSubmitting(true);
     
     try {
       const orderId = `${Date.now()}`;
@@ -79,7 +74,7 @@ export default function Checkout({ onBack }: CheckoutProps) {
           <tbody>
             ${cartItems.map(item => `
               <tr>
-                <td>${item.name}</td>
+                <td>${item.title}</td>
                 <td>${item.quantity}</td>
                 <td>$${item.price.toFixed(2)}</td>
                 <td>$${(item.price * item.quantity).toFixed(2)}</td>
@@ -118,19 +113,17 @@ export default function Checkout({ onBack }: CheckoutProps) {
         throw new Error(`Email sending failed: ${emailResponse.text}`);
       }
 
-      toast.success('Order placed successfully! Check your email for confirmation.');
+      toast.success('Check your email.');
       
       if (onBack) {
         onBack();
       } else {
         navigate("/");
       }
-    } catch (error: any) {
-      const errorMessage = error.text || error.message || 'Failed to send order confirmation';
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send order confirmation';
       toast.error(errorMessage);
       console.error('Error:', error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -173,7 +166,7 @@ export default function Checkout({ onBack }: CheckoutProps) {
         ) : (
           <div className="grid md:grid-cols-5 gap-6">
             <div className="md:col-span-3 space-y-6">
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                 <ShippingForm 
                   formData={formData}
                   estimatedShipping={estimatedShipping}
@@ -186,7 +179,7 @@ export default function Checkout({ onBack }: CheckoutProps) {
               <OrderSummary 
                 total={total} 
                 onSubmit={handleSubmit}
-                isSubmitting={isSubmitting}
+                formData={formData}
               />
             </div>
           </div>

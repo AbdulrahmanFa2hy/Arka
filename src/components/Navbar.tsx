@@ -23,7 +23,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-white shadow-lg sticky w-full top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <Link to="/" className="text-xl font-bold text-gray-800">
@@ -32,7 +32,7 @@ export default function Navbar() {
             </div>
             
             {isHomePage && (
-              <div className="flex flex-1 justify-center px-4 lg:px-8">
+              <div className="flex flex-1 justify-center px-2 sm:px-4 lg:px-8">
                 <div className="relative w-full max-w-lg">
                   <input
                     type="text"

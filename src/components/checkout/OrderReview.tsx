@@ -1,6 +1,5 @@
 import React from 'react';
-import { HiArrowLongRight } from 'react-icons/hi2';
-import { CartItem } from '../../types/cart';
+import { CartItem } from '../../types';
 
 interface OrderReviewProps {
   cartItems: CartItem[];
@@ -17,9 +16,9 @@ export function OrderReview({ cartItems, onNext }: OrderReviewProps) {
         {cartItems.map((item) => (
           <div key={item.id} className="flex items-center justify-between border-b pb-4">
             <div className="flex items-center">
-              <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+              <img src={item.images[0]} alt={item.title} className="w-16 h-16 object-cover rounded" />
               <div className="ml-4">
-                <h3 className="font-medium">{item.name}</h3>
+                <h3 className="font-medium">{item.title}</h3>
                 <p className="text-gray-600">Quantity: {item.quantity}</p>
               </div>
             </div>
